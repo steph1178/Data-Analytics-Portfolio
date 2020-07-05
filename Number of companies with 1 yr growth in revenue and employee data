@@ -1,0 +1,14 @@
+SELECT count(*) 
+FROM `company_profile` AS `CP` 
+LEFT JOIN `geo_country` AS `GEO_COUNTRY` 
+ON CP.headquarters_country_code = GEO_COUNTRY.country_code 
+LEFT JOIN `geo_state` AS `GEO_STATE` 
+ON CP.headquarters_country_code = GEO_STATE.country_code AND CP.headquarters_state_code = GEO_STATE.state_code 
+WHERE (CP.index_classification NOT IN ('Dead', 'Non-Profit', 'Public','State Owned')) 
+AND (CP.index_acquired_by_public_company = "No") 
+AND (CP.id NOT IN (SELECT company_profile_id FROM company_tag WHERE tag="INACTIVE")) 
+AND (CP.published = "Yes") AND ((CP.headquarters_country_code IN ('US'))) 
+AND ((search_index_growth_rate_1 != "") AND ((CP.search_index_growth_rate_1+0 >= 0))
+OR (search_index_employee_growth_rate_1 != "") 
+AND ((CP.search_index_employee_growth_rate_1+0 >= 0))) 
+AND index_revenues_2014 <> ''
