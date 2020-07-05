@@ -1,0 +1,12 @@
+SELECT
+cp.id,
+cp.name, 
+unit_price, 
+FROM_UNIXTIME(purchase_date), 
+count(*) 
+FROM user_report_purchase pc
+JOIN company_profile cp
+ON pc.profile_id = cp.id
+WHERE pc.profile_type = 'Company' and pc.status = 'Active'
+GROUP BY pc.profile_id
+ORDER BY count(*) desc
