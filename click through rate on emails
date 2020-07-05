@@ -1,0 +1,23 @@
+WITH art as 
+  (
+  SELECT url
+  FROM public.article 
+  WHERE tag = 'Shoppable'
+  AND len(url) >0
+  AND publication_date IS NOT NULL
+  )
+ , targ as 
+  (
+  SELECT split_part(target,'?',1) as target, campaign_id 
+  FROM email_campaign_links
+  )
+ , senddate as 
+  (
+  SELECT campaign_id, send_date 
+  FROM email_campaign
+  )
+SELECT targ.target, senddate.send_date
+FROM targ
+JOIN art ON targ.target = art.url
+JOIN senddate on targ.campaign_id = senddate.campaign_id 
+WHERE senddate.send_date >= ‘2020-03-19'
