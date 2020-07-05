@@ -1,0 +1,21 @@
+SELECT name, id, emp_2011, emp_2012, emp_2013, index_revenues_2013  
+FROM
+(
+  SELECT *, 
+  substr(concat(index_employees,'|'),locate('2011:',concat(index_employees,'|'))+5,
+  locate('|',concat(index_employees,'|'),locate('2011:',concat(index_employees,'|')))-locate('2011:',concat(index_employees,'|'))-5)
+  as emp_2011,
+  substr(concat(index_employees,'|'),locate('2012:',concat(index_employees,'|'))+5,
+  locate('|',concat(index_employees,'|'),locate('2012:',concat(index_employees,'|')))-locate('2012:',concat(index_employees,'|'))-5)
+  as emp_2012,
+  substr(concat(index_employees,'|'),locate('2013:',concat(index_employees,'|'))+5,
+  locate('|',concat(index_employees,'|'),locate('2013:',concat(index_employees,'|')))-locate('2013:',concat(index_employees,'|'))-5)
+  as emp_2013
+  FROM company_profile
+  WHERE headquarters_country_code = 'US'
+      ) a 
+WHERE classification = 'private'
+AND  length(emp_2011) <1 
+AND length(emp_2012) <1 
+AND length(emp_2013) <1 
+AND length(index_revenues_2013) >1;
