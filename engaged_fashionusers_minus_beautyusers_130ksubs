@@ -1,0 +1,47 @@
+WITH beauty_segment AS (
+     SELECT user_id
+     FROM pages
+     JOIN national_subscribers ON user_id = visitor_id
+     WHERE context_page_path LIKE '/beauty%'
+     AND timestamp >= CURRENT_DATE - 120
+     AND user_id IS NOT NULL
+     GROUP BY 1
+    ),
+
+ fashion_segment AS (
+     SELECT user_id
+     FROM pages
+     JOIN national_subscribers ON user_id = visitor_id
+     WHERE context_page_path LIKE '/fashion%'
+     AND timestamp >= CURRENT_DATE - 120
+     AND user_id IS NOT NULL
+     AND user_id NOT IN (
+         SELECT *
+         FROM beauty_segment
+         )
+     GROUP BY 1
+    ),
+
+random_subscribers as (
+    SELECT visitor_id
+    FROM national_subscribers
+    JOIN pages ON visitor_id = user_id
+     WHERE user_id NOT IN (
+         SELECT user_id
+         FROM fashion_segment
+         )
+    GROUP BY 1
+    ORDER BY random()
+    LIMIT 61000),
+
+ combined AS (
+     SELECT user_id::BIGINT FROM fashion_segment
+     UNION
+     SELECT visitor_id FROM random_subscribers
+     GROUP BY 1)
+
+SELECT * FROM national_subscribers
+WHERE visitor_id IN (
+        SELECT user_id
+        FROM combined
+    )
