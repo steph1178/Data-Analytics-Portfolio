@@ -1,0 +1,14 @@
+SELECT a.visitor_id, a.gender, a.zip, a.income, 
+        b.incomeperhousehold, a.age, a.num_emails_shared,
+        b.city, b.state,
+        COUNT(state) OVER (PARTITION BY state) as stateCount
+FROM visitor a
+LEFT JOIN zip_code_data b
+ON a.zip = b.zipcode
+WHERE visitor_id IN
+ (SELECT visitor_id
+    FROM email_tracker
+    WHERE (campaign_id = 43814
+    OR campaign_id = 43815)
+    AND target like 'https://savings.brilliantdistinctionsprogram.com/juvederm-it-75%'
+    )
