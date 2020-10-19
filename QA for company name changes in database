@@ -1,9 +1,0 @@
-SELECT cp.id, cp.name 'Company Name', cfn.name 'Former Name',summary, narrative 
-FROM company_profile cp 
-LEFT JOIN company_former_name cfn on cp.id = cfn.company_profile_id
-WHERE (summary like concat('%',cfn.name,'%') 
-OR narrative like concat('%',cfn.name,'%')) 
-AND cp.classification = 'Private'
-AND cp.headquarters_country_code='US'
-AND  cp.index_acquired_by_public_company <> 'Yes'
-GROUP BY cp.id
