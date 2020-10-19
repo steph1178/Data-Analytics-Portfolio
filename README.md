@@ -6,15 +6,16 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 - [Engaged User Segment](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/segmenting%20engaged%20users): This query finds all users who have interacted with company site in the past three months.   
 
 ## Performance Reporting    
-* [Click-through and Open Rates on Email Campaign](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Email%20Campaign%20CTR%20and%20Open%20Rates): this query calculates the CTR and open rates for an email campaign.   
-* [Top Purchased Reports](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/A%20list%20of%20the%20company's%20%20most%20purchased%20reports): this query pulls and counts the number of times each report has been purchased from the company and lists it in order of most purchased to least purchased.    
+* [Click-through and Open Rates on Email Campaign](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Email%20Campaign%20CTR%20and%20Open%20Rates): This query calculates the CTR and open rates for an email campaign.   
+* [Top Purchased Reports](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/A%20list%20of%20the%20company's%20%20most%20purchased%20reports): This query pulls and counts the number of times each report has been purchased from the company and lists it in order of most purchased to least purchased. 
+* [Data Connection For Data Studio Report](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Data%20Connection%20For%20Data%20Studio): This query creates a data connection in Data Studio for affiliate data. The data connection was used to create a dashboard of affiliate purchase data.
 
 
 
 ## Analysis
 - [Links Clicked in Shoppable Emails](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/CTR%20on%20Shopping%20Emails): This query pulls back all links clicked in shoppable emails for analytical purposes.
 * [Demographic Data Pull](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/demographic%20data%20pull): This query pulls back demographic data of users sent an email campaign.
-* [Growth Rates of European Countries](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Revenue%20Growth%20Rates%20for%20European%20Companies): this query creates a calculated column of growth rates of European companies limited to companies with rates between -25% and 50% for a client report.
+* [Growth Rates of European Countries](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Revenue%20Growth%20Rates%20for%20European%20Companies): This query creates a calculated column of growth rates of European companies limited to companies with rates between -25% and 50% for a client report.
 * [QA for Missing Employee Data](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/QA%20Missing%20Data): This query searches for missing employee data in a database for quality assurance purposes. Employee data was stored in single column as "year:number" format, with a vertical pipe separating the years.
 
 ## Python Projects
