@@ -17,5 +17,5 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 * [QA for Missing Employee Data](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/QA%20Missing%20Data): This query searches for missing employee data in a database for quality assurance purposes. Employee data was stored in single column as "year:number" format, with a vertical pipe separating the years.
 
 ## Python Projects
-* [Sweepstakes Winner Generator](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Sweepstakes%20Winner%20Generator): This program pulls a random sweepstakes winner from an Excel file.
-* [Inventory Database](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Inventory%20Database): This program creates a dictionary named "inventory", allows a user to enter more items to the dictionary, and then prints a list with items counts.
+* [Preprocessing User Feedback Data](https://github.com/steph1178/Data-Analytics-Portfolio/commit/eb90f5e2ee4a5213ff08c99f893a20d2c8334c76): This program processes, cleans and transforms user feedback data from the company's site, making it useable for data visualizations and NLP.
+
