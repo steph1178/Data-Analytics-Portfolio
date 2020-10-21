@@ -1,0 +1,60 @@
+import pandas as pd
+import nltk
+import string
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import WordNetLemmatizer
+
+
+userFeedback = pd.read_csv('/Users/stephanie.pandolph/Desktop/nps 10_13.csv', encoding='latin-1')
+#data check step: check number of rows and columns
+#userFeedback.shape
+
+#data check step: calculate the % missing values of each column and sort by most to least to find columns to drop
+#userFeedback.isnull().mean().sort_values(ascending=False)
+
+#data check step: check count of values in column
+#userFeedback['specific 4'].value_counts(dropna=False)
+
+#data check step: check data types:
+#userFeedback.dtypes
+
+#use for loop to fill all null values
+for col in userFeedback:
+    if type(userFeedback[col])== 'object':
+        userFeedback[col] = userFeedback[col].fillna(value='unknown')
+    else:
+        userFeedback[col] = userFeedback[col].fillna(value=0)
+
+#data check step: check for any leftover nulls:
+#userFeedback.isnull().sum().sum()
+
+#cleanup and rename columns and convert feedback to string
+userFeedback.columns = [x.lower() for x in 
+                        userFeedback.columns.str.replace(" ","_").str.replace("[:?]","")]
+userFeedback.rename(columns = {'q1_what_is_the_likelihood_that_you_would_recommend_purewow_to_a_friend_or_colleague':'q1_nps_score','q2_what_is_the_reason_for_your_answer':'q2_reason'}, inplace=True)
+userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
+userFeedback = userFeedback[["q1_nps_score","q2_reason"]]
+
+#tokenize feedback
+tokenizer = RegexpTokenizer(r'\w+')
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: tokenizer.tokenize(x.lower()))
+
+#remove stop words
+def remove_stopwords(text):
+    words = [w for w in text if w not in stopwords.words('english')]
+    return words
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: remove_stopwords(x))
+
+#lemmatize words
+lemmatizer = WordNetLemmatizer()
+
+def word_lemmatizer(text):
+    lem_text = [lemmatizer.lemmatize(i) for i in text]
+    return lem_text
+
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: word_lemmatizer(x))
+
+#preview data
+userFeedback.head(40)
+
