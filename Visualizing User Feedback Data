@@ -1,0 +1,99 @@
+import pandas as pd
+import nltk
+import string
+from nltk.corpus import stopwords
+from nltk.tokenize import RegexpTokenizer
+from nltk.stem import WordNetLemmatizer
+from collections import Counter
+import numpy as np
+import matplotlib.pyplot as plt
+from wordcloud import WordCloud
+
+%matplotlib inline
+
+userFeedback = pd.read_csv('/Users/stephanie.pandolph/Desktop/nps 10_13.csv')
+
+#check data types:
+#userFeedback.dtypes
+
+#use for loop to fill all null values
+for col in userFeedback:
+    if type(userFeedback[col])== 'object':
+        userFeedback[col] = userFeedback[col].fillna(value='unknown')
+    else:
+        userFeedback[col] = userFeedback[col].fillna(value=0)
+
+#check for any leftover nulls:
+#userFeedback.isnull().sum().sum()
+
+#cleanup and rename columns and convert feedback to string
+
+userFeedback.columns = [x.lower() for x in 
+                        userFeedback.columns.str.replace(" ","_").str.replace("[:?]","")]
+userFeedback.rename(columns = {'q1_what_is_the_likelihood_that_you_would_recommend_purewow_to_a_friend_or_colleague':'q1_nps_score','q2_what_is_the_reason_for_your_answer':'q2_reason'}, inplace=True)
+userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
+userFeedback = userFeedback[["q1_nps_score","q2_reason"]]
+userFeedback['q2_reason'] = userFeedback['q2_reason'].str.replace(r'[^\w\s]+', '')
+
+#tokenize feedback
+tokenizer = RegexpTokenizer(r'\w+')
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: tokenizer.tokenize(x.lower()))
+
+#remove stop words
+def remove_stopwords(text):
+    words = [w for w in text if w not in stopwords.words('english')]
+    return words
+
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: remove_stopwords(x))
+
+
+#lemmatize
+lemmatizer = WordNetLemmatizer()
+
+def word_lemmatizer(text):
+    lem_text = [lemmatizer.lemmatize(i) for i in text]
+    return lem_text
+
+userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: word_lemmatizer(x))
+
+#convert column back to string
+userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
+
+#remove characters added by nltk and empty values
+review_list = userFeedback['q2_reason'].to_list()
+reviews_clean = []
+for w in review_list:
+    reviews_clean.append(w.replace(']', '',).replace('[','').replace('0','').replace('\"','').replace("\'",'')) 
+reviews = list(filter(None, reviews_clean)) 
+
+#word count frequency top ten
+counts = Counter(reviews).most_common(10)
+
+#create a wordcloud
+wordcloud = WordCloud(
+    background_color ='white',
+    max_words = 250,
+    max_font_size = 40).generate(str(' '.join(reviews)))
+
+    
+fig = plt.figure(1, figsize =(20, 20))
+plt.axis("off")
+       
+plt.imshow(wordcloud)
+plt.show()
+
+
+# convert list to DF and Plot horizontal bar using matplotlib bar().
+
+userReviews = pd.DataFrame(counts,
+                          columns = ['words','count'])
+
+fig,ax = plt.subplots(figsize=(8,8))
+
+userReviews.sort_values(by='count').plot.barh(x = 'words',
+                                           y = 'count',
+                                           ax=ax,
+                                           color = 'purple')
+ax.set_title("Most common words in NPS feedback")
+
+plt.show()  
