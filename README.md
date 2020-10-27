@@ -16,6 +16,6 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 * [Growth Rates of European Countries](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Revenue%20Growth%20Rates%20for%20European%20Companies): This query creates a calculated column of growth rates of European companies limited to companies with rates between -25% and 50% for a client report.
 * [QA for Missing Employee Data](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/QA%20Missing%20Data): This query searches for missing employee data in a database for quality assurance purposes. Employee data was stored in single column as "year:number" format, with a vertical pipe separating the years.
 
-## Python Projects
-* [Preprocessing User Feedback Data](https://github.com/steph1178/Data-Analytics-Portfolio/commit/eb90f5e2ee4a5213ff08c99f893a20d2c8334c76): This program processes, cleans and transforms user feedback data from the company's site, making it useable for data visualizations and NLP.
+## Data Visualization
+* [Visualizing User Feedback Data](https://github.com/steph1178/Data-Analytics-Portfolio/commit/f9cb97d224a9b7b66fb925db88691432ecaa32d3): This program processes, cleans and transforms user feedback data from the company's site and creates a Word Cloud and bar graph that visualizes common words used in the reviews.
 
