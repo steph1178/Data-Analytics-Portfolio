@@ -2,7 +2,7 @@ import pandas as pd
 import nltk
 import string
 from nltk.corpus import stopwords
-from nltk.tokenize import RegexpTokenizer
+from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from collections import Counter
 import numpy as np
@@ -34,37 +34,37 @@ userFeedback.rename(columns = {'q1_what_is_the_likelihood_that_you_would_recomme
 userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
 userFeedback = userFeedback[["q1_nps_score","q2_reason"]]
 userFeedback['q2_reason'] = userFeedback['q2_reason'].str.replace(r'[^\w\s]+', '')
+userFeedback['q2_reason'] = userFeedback['q2_reason'].str.lower()
 
 #tokenize feedback
-tokenizer = RegexpTokenizer(r'\w+')
-userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: tokenizer.tokenize(x.lower()))
+tokens = [ nltk.word_tokenize( str(sentence) ) for sentence in userFeedback['q2_reason'] ]
+
+#flatten sublists
+flattened_tokens = [val for sublist in tokens for val in sublist]
 
 #remove stop words
-def remove_stopwords(text):
-    words = [w for w in text if w not in stopwords.words('english')]
-    return words
-
-userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: remove_stopwords(x))
-
+stop_words = set(stopwords.words('english')) 
+  
+stopwords_removed = [w for w in flattened_tokens if not w in stop_words] 
+  
+stopwords_removed = [] 
+  
+for w in flattened_tokens: 
+    if w not in stop_words: 
+        stopwords_removed.append(w) 
 
 #lemmatize
 lemmatizer = WordNetLemmatizer()
 
-def word_lemmatizer(text):
-    lem_text = [lemmatizer.lemmatize(i) for i in text]
-    return lem_text
-
-userFeedback['q2_reason'] = userFeedback['q2_reason'].apply(lambda x: word_lemmatizer(x))
-
-#convert column back to string
-userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
+lemmatized_words = [lemmatizer.lemmatize(w) for w in stopwords_removed]
 
 #remove characters added by nltk and empty values
-review_list = userFeedback['q2_reason'].to_list()
+
 reviews_clean = []
-for w in review_list:
+for w in lemmatized_words:
     reviews_clean.append(w.replace(']', '',).replace('[','').replace('0','').replace('\"','').replace("\'",'')) 
 reviews = list(filter(None, reviews_clean)) 
+
 
 #word count frequency top ten
 counts = Counter(reviews).most_common(10)
@@ -72,7 +72,7 @@ counts = Counter(reviews).most_common(10)
 #create a wordcloud
 wordcloud = WordCloud(
     background_color ='white',
-    max_words = 250,
+    max_words = 150,
     max_font_size = 40).generate(str(' '.join(reviews)))
 
     
@@ -96,4 +96,4 @@ userReviews.sort_values(by='count').plot.barh(x = 'words',
                                            color = 'purple')
 ax.set_title("Most common words in NPS feedback")
 
-plt.show()  
+plt.show()
