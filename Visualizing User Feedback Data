@@ -11,7 +11,7 @@ from wordcloud import WordCloud
 
 %matplotlib inline
 
-userFeedback = pd.read_csv('/Users/stephanie.pandolph/Desktop/nps 10_13.csv')
+userFeedback = pd.read_csv('/Users/stephanie.pandolph/Desktop/Buying Habits Survey.csv')
 
 #check data types:
 #userFeedback.dtypes
@@ -30,27 +30,35 @@ for col in userFeedback:
 
 userFeedback.columns = [x.lower() for x in 
                         userFeedback.columns.str.replace(" ","_").str.replace("[:?]","")]
-userFeedback.rename(columns = {'q1_what_is_the_likelihood_that_you_would_recommend_purewow_to_a_friend_or_colleague':'q1_nps_score','q2_what_is_the_reason_for_your_answer':'q2_reason'}, inplace=True)
+#check the column names and update the rename section below
+#userFeedback.head()
+userFeedback.rename(columns = {'if_no,_please_explain_why':'q2_reason'}, inplace=True)
 userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
-userFeedback = userFeedback[["q1_nps_score","q2_reason"]]
+userFeedback = userFeedback[["q2_reason"]]
 userFeedback['q2_reason'] = userFeedback['q2_reason'].str.replace(r'[^\w\s]+', '')
 userFeedback['q2_reason'] = userFeedback['q2_reason'].str.lower()
 
 #tokenize feedback
+
 tokens = [ nltk.word_tokenize( str(sentence) ) for sentence in userFeedback['q2_reason'] ]
 
 #flatten sublists
 flattened_tokens = [val for sublist in tokens for val in sublist]
 
-#remove stop words
-stop_words = set(stopwords.words('english')) 
+
+
+# # #remove stop words
   
-stopwords_removed = [w for w in flattened_tokens if not w in stop_words] 
+stopwords = nltk.corpus.stopwords.words('english')
+newStopWords = ['text','see','feel','would','want','prefer']
+stopwords.extend(newStopWords)
+  
+stopwords_removed = [w for w in flattened_tokens if not w in stopwords] 
   
 stopwords_removed = [] 
   
 for w in flattened_tokens: 
-    if w not in stop_words: 
+    if w not in stopwords: 
         stopwords_removed.append(w) 
 
 #lemmatize
@@ -72,7 +80,7 @@ counts = Counter(reviews).most_common(10)
 #create a wordcloud
 wordcloud = WordCloud(
     background_color ='white',
-    max_words = 150,
+    max_words = 100,
     max_font_size = 40).generate(str(' '.join(reviews)))
 
     
