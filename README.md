@@ -2,7 +2,7 @@
 This repository contains a sample of data analytics projects using SQL and Python completed for professional and self-learning purposes.
 
 ## User Segmenting    
-- [Engaged Beauty and Fashion Users](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Segmented%20engaged%20beauty%20and%20fashion%20users): This query finds all users who have viewed fashion or beauty content within the past four months and generates a list to send related email content to.     
+- [Engaged Beauty and Fashion Users](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Segmented%20engaged%20beauty%20and%20fashion%20users): This query finds all users who have viewed fashion content, but not beauty content within the past four months, and generates a list to send related email content to.     
 - [Engaged User Segment](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/segmenting%20engaged%20users): This query finds all users who have interacted with the company site in the past three months.   
 
 ## Performance Reporting    
