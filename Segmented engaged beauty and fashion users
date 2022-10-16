@@ -1,47 +1,52 @@
-WITH beauty_segment AS (
-     SELECT user_id
+WITH 
+
+-- pull all email subscribers that have visited a beauty webpage in the past 120 days
+-- to ensure exclusion from fashion segment users
+beauty_segment AS (
+     SELECT DISTINCT user_id
      FROM pages
-     JOIN national_subscribers ON user_id = visitor_id
-     WHERE context_page_path LIKE '/beauty%'
-     AND timestamp >= CURRENT_DATE - 120
-     AND user_id IS NOT NULL
-     GROUP BY 1
+     INNER JOIN national_subscribers 
+          ON pages.visitor_id = national_subscribers.user_id
+     WHERE 
+          pages.context_page_path LIKE '/beauty%'
+          AND pages.timestamp >= CURRENT_DATE - 120
+          AND national_subscribers.user_id IS NOT NULL
     ),
 
+-- pull all email subscribers that have visited a fashion webpage in the past 120 days 
+-- but have NOT visited a beauty webpage in the past 120 days
  fashion_segment AS (
-     SELECT user_id
+     SELECT DISTINCT user_id
      FROM pages
-     JOIN national_subscribers ON user_id = visitor_id
-     WHERE context_page_path LIKE '/fashion%'
-     AND timestamp >= CURRENT_DATE - 120
-     AND user_id IS NOT NULL
-     AND user_id NOT IN (
-         SELECT *
-         FROM beauty_segment
-         )
-     GROUP BY 1
+     INNER JOIN national_subscribers 
+          ON pages.visitor_id = national_subscribers.user_id
+     WHERE 
+          context_page_path LIKE '/fashion%'
+          AND timestamp >= CURRENT_DATE - 120
+          AND user_id IS NOT NULL
+          AND user_id NOT IN (
+              SELECT *
+              FROM beauty_segment
+              )
     ),
 
+-- pull a randomized list of 61k subscribers not in the fashion segment
 random_subscribers as (
-    SELECT visitor_id
-    FROM national_subscribers
-    JOIN pages ON visitor_id = user_id
+     SELECT DISTINCT user_id
+     FROM pages
+     INNER JOIN national_subscribers 
+          ON pages.visitor_id = national_subscribers.user_id
      WHERE user_id NOT IN (
          SELECT user_id
          FROM fashion_segment
          )
-    GROUP BY 1
-    ORDER BY random()
-    LIMIT 61000),
+     GROUP BY 1
+     ORDER BY random()
+     LIMIT 61000),
 
- combined AS (
+-- combine the lists for email send
      SELECT user_id::BIGINT FROM fashion_segment
      UNION
      SELECT visitor_id FROM random_subscribers
-     GROUP BY 1)
 
-SELECT * FROM national_subscribers
-WHERE visitor_id IN (
-        SELECT user_id
-        FROM combined
-    )
+
