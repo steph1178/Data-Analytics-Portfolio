@@ -9,8 +9,7 @@ email_users as (
 )
 
 -- find the states with the highest number of high-income earners that were targeted by the campaign
-state
-SELECT  ]]
+SELECT 
     count(visitor_id) as visitor_ct,
     income_bands,
     state    
