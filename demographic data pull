@@ -1,14 +1,23 @@
-SELECT a.visitor_id, a.gender, a.zip, a.income, 
-        b.incomeperhousehold, a.age, a.num_emails_shared,
-        b.city, b.state,
-        COUNT(state) OVER (PARTITION BY state) as stateCount
-FROM visitor a
-LEFT JOIN zip_code_data b
-ON a.zip = b.zipcode
-WHERE visitor_id IN
- (SELECT visitor_id
+WITH
+
+-- pull the ids for the email campaign we are analyzing
+email_users as (
+    SELECT visitor_id
     FROM email_tracker
-    WHERE (campaign_id = 43814
-    OR campaign_id = 43815)
+    WHERE campaign_id in (43814, 43815)
     AND target like 'https://savings.brilliantdistinctionsprogram.com/juvederm-it-75%'
-    )
+)
+
+-- find the states with the highest number of high-income earners that were targeted by the campaign
+state
+SELECT  ]]
+    count(visitor_id) as visitor_ct,
+    income_bands,
+    state    
+FROM visitor
+INNER JOIN email_users
+GROUP BY income_bands, state
+ORDER BY income_bands desc, visitor_ct desc
+
+
+
