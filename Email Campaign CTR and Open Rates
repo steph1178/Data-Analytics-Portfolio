@@ -22,6 +22,7 @@ email_event_counts as (
     WHERE ecu.campaign_id = '43938'
 )
 
+-- calculate the CTR and open rate for the email campaign
 SELECT 
     (clicks/sends::float)*100 as CTR,
     (opens/csends::float)*100 as open_rate
