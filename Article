@@ -1,0 +1,36 @@
+WITH 
+
+-- select all articles with shoppable affiliate links
+article_urls as (
+    SELECT
+    url
+    FROM public.article
+    WHERE 
+        style_name = 'Shoppable'
+        AND len(url) >0
+        AND publication_date IS NOT NULL
+        
+        ),
+        
+-- select all email campaign links        
+email_links as (
+    SELECT 
+        split_part(target,'?',1) as email_link, 
+        campaign_id
+    FROM email_campaign_links
+    ), 
+    
+send_date as (
+    select 
+        campaign_id, 
+        send_date
+    from email_campaign
+    )
+    
+ -- grab all the email links that refer back to a shoppable article by the send date   
+SELECT 
+    email_link, 
+    send_date 
+FROM email_links
+INNER JOIN article_urls ON email_links.target = article_urls.url
+LEFT JOIN send_date on article_urls.campaign_id = send_date.campaign_id
