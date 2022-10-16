@@ -3,7 +3,7 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 
 ## User Segmenting    
 - [Engaged Beauty and Fashion Users](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Segmented%20engaged%20beauty%20and%20fashion%20users): This query finds all users who have viewed fashion content, but not beauty content within the past four months, and generates a list to send related email content to.     
-- [Engaged User Segment](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/segmenting%20engaged%20users): This query finds all users who have interacted with the company site in the past three months.   
+  
 
 ## Performance Reporting    
 * [Click-through and Open Rates on Email Campaign](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Email%20Campaign%20CTR%20and%20Open%20Rates): This query calculates the CTR and open rates for an email campaign.   
