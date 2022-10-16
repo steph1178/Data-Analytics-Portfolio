@@ -5,8 +5,6 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 ## Analysis
 * [COVID Data Analysis Project](https://github.com/steph1178/COVID19_testing_analytics/blob/main/Metrics%20Documentation.md): For this project, I pulled the total number of PCR tests as of 5/1/2021, the 7-day rolling average of new cases per day, and the top 10 states with the highest positivity rates. I also provide a written analysis of the results, that outline shortcomings of the metrics and data collection process.
 * [Incomes of Users in Targeted Email](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/incomes%20of%20users%20in%20targeted%20email): This query pulls states with the highest number of high-income earners that were targeted by a luxury email campaign.
-* [Growth Rates of European Countries](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Revenue%20Growth%20Rates%20for%20European%20Companies): This query creates a calculated column of growth rates of European companies limited to companies with rates between -25% and 50% for a client report.
-* [QA for Missing Employee Data](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/QA%20Missing%20Data): This query searches for missing employee data in a database for quality assurance purposes. Employee data was stored in single column as "year:number" format, with a vertical pipe separating the years.
 
 
 ## User Segmenting    
