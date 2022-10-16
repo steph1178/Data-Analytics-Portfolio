@@ -7,7 +7,6 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 
 ## Performance Reporting    
 * [Click-through and Open Rates on Email Campaign](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Email%20Campaign%20CTR%20and%20Open%20Rates): This query calculates the CTR and open rates for an email campaign.   
-* [Top Purchased Reports](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/A%20list%20of%20the%20company's%20%20most%20purchased%20reports): This query pulls and counts the number of times each report has been purchased from the company and lists it in order of most purchased to least purchased. 
 * [Affiliate Data Sample For Data Studio Report](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/email%20shoppable%20links%20for%20Data%20Studio%20Dashboard): This query creates a data connection in Data Studio for affiliate data. The data connection was used to create a dashboard of affiliate purchase data.
 
 ## Analysis
