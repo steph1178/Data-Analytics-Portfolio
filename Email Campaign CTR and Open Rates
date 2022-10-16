@@ -1,31 +1,29 @@
-WITH sends as
-    (SELECT num_emails_sent, campaign_id
-    FROM email_campaign
-    WHERE campaign_id = '43938'),
+WITH 
 
-opens as
-    (SELECT opencount, campaign_id
-    FROM open_count
-    WHERE campaign_id = '43938'),
+-- count the number of events for a specific email campaign
+email_event_counts as (
+    SELECT 
+        count(distinct
+            case when ecu.sent_at is not null
+            then ecu.id end
+            ) as sends,
+            
+        count(distinct
+            case when ecu.opened_at is not null
+            then ecu.id end
+            ) as opens,   
+            
+         count(distinct
+            case when ee.event = 'click'
+            then ecu.id end
+            ) as clicks,           
+    FROM email_campaign_users ecu
+    LEFT JOIN email_events ee on ecu.campaigns_id = ee.campaign_id
+    WHERE ecu.campaign_id = '43938'
+)
 
-clicks as
-         (SELECT count(event) as num_clicks, campaign_id
-          FROM link_clicked
-          WHERE label NOT IN
-                ('Opened', 'UNSUBSCRIBE', 'Mobile:UNSUBSCRIBE', 'Privacy Policy',
-                 'Advertise', 'privacy@purewow.com', 'About', 'Contact', 'Search', 'Help',
-                 'Editorial Policy', 'Press', 'Terms & Conditions', 'Mobile:Contact', 'Contests',
-                 'My Account', 'Jobs', 'Mobile:Help', 'Mobile:Privacy Policy', 'Mobile:My Account',
-                 'Mobile:Search', 'Mobile:Jobs', 'Mobile:About', 'Mobile:Contests',
-                 'Mobile:Editorial Policy', 'Mobile:Advertise', 'Mobile:Press',
-                 'Mobile:Terms & Conditions',
-                 'If you\'re having trouble viewing this email,  click here')
-                AND campaign_id ='43938'
-             GROUP BY campaign_id
-         )
-SELECT (num_clicks/cast(num_emails_sent as decimal(12,6)))*100 as CTR,
-       (opencount/cast(num_emails_sent as decimal (12,6)))*100 as open_rate
-FROM sends
-JOIN opens ON sends.campaign_id = opens.campaign_id
-JOIN clicks ON sends.campaign_id = clicks.campaign_id
+SELECT 
+    (clicks/sends::float)*100 as CTR,
+    (opens/csends::float)*100 as open_rate
+FROM email event_counts
 
