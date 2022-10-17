@@ -12,6 +12,7 @@ This repository contains a sample of data analytics projects using SQL and Pytho
   
 
 ## Performance Reporting    
+* [Contracts Closed by Week and Type of Contract Type](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Contract%20Types%20Closed%20Over%20Time): This query pulls contracts closed on a weekly basis and categorizes them for reporting purposes.
 * [Click-through and Open Rates on Email Campaign](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Email%20Campaign%20CTR%20and%20Open%20Rates): This query calculates the CTR and open rates for an email campaign.   
 * [Affiliate Data Sample For Data Studio Report](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/email%20shoppable%20links%20for%20Data%20Studio%20Dashboard): This query creates a data connection in Data Studio for affiliate data. The data connection was used to create a dashboard of affiliate purchase data.
 
