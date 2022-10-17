@@ -1,107 +1,100 @@
+# import all modules needed
+import redshift_connector
 import pandas as pd
 import nltk
-import string
+from nltk import pos_tag, word_tokenize
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 from nltk.stem import WordNetLemmatizer
 from collections import Counter
-import numpy as np
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 
-%matplotlib inline
+# open engine connection: conn
+# grab credentials from .env file
+conn = redshift_connector.connect(
+     host='host',
+     database='database',
+     user='name',
+     password='password'
+  )
 
-userFeedback = pd.read_csv('/Users/stephanie.pandolph/Desktop/Buying Habits Survey.csv')
+cursor = conn.cursor()
+# perform query
+cursor.execute(
+    """
+    select 
+        user_survey_id,
+        question_141
+    from survey_results
+    where question_141 is not null;
+    """
+)
 
-#check data types:
-#userFeedback.dtypes
+# save the results of the query to a pandas df
+df: pd.DataFrame = cursor.fetch_dataframe()
 
-#use for loop to fill all null values
-for col in userFeedback:
-    if type(userFeedback[col])== 'object':
-        userFeedback[col] = userFeedback[col].fillna(value='unknown')
-    else:
-        userFeedback[col] = userFeedback[col].fillna(value=0)
+# close the connection to redshift
+conn.close()
 
-#check for any leftover nulls:
-#userFeedback.isnull().sum().sum()
+# standard cleaning of data:lowercase all and strip whitespace
+org_feedback = df['question_141'].apply(lambda x: x.strip().lower())
 
-#cleanup and rename columns and convert feedback to string
+# custom clean up of html taggings and convert feedback to a string
+org_feedback= org_feedback.str.replace("<p>", "").str.replace("</p>", "").str.\
+    replace("<em>", "").str.replace("</em>", "")
+org_feedback = org_feedback.astype(str)
 
-userFeedback.columns = [x.lower() for x in 
-                        userFeedback.columns.str.replace(" ","_").str.replace("[:?]","")]
-#check the column names and update the rename section below
-#userFeedback.head()
-userFeedback.rename(columns = {'if_no,_please_explain_why':'q2_reason'}, inplace=True)
-userFeedback['q2_reason'] = userFeedback['q2_reason'].astype(str)
-userFeedback = userFeedback[["q2_reason"]]
-userFeedback['q2_reason'] = userFeedback['q2_reason'].str.replace(r'[^\w\s]+', '')
-userFeedback['q2_reason'] = userFeedback['q2_reason'].str.lower()
+# replace symbols: this is also stripping hyphenated words like self-reflection
+# r' matches char literally(case sensitive)
+# \w matches any alpha numeric, \s any whitespace character
+# + matches the previous token between one and unlimited times, as many times as possible, giving back as needed
+org_feedback = org_feedback.str.replace(r'[^\w\s]+', '')
+   
 
-#tokenize feedback
+# tokenize feedback
+tokens = [word_tokenize(str(sentence)) for sentence in org_feedback]
 
-tokens = [ nltk.word_tokenize( str(sentence) ) for sentence in userFeedback['q2_reason'] ]
-
-#flatten sublists
+# flatten sublists
 flattened_tokens = [val for sublist in tokens for val in sublist]
 
+# # remove stop words
+stopwords = stopwords.words('english')
+# optional code snippet left in as reference for if more stop words are needed
+# newStopWords = ['session', 'sessions', 'meeting']
+# stopwords.extend(newStopWords)
+stopwords_removed = [w for w in flattened_tokens if w not in stopwords]
 
 
-# # #remove stop words
-  
-stopwords = nltk.corpus.stopwords.words('english')
-newStopWords = ['text','see','feel','would','want','prefer']
-stopwords.extend(newStopWords)
-  
-stopwords_removed = [w for w in flattened_tokens if not w in stopwords] 
-  
-stopwords_removed = [] 
-  
-for w in flattened_tokens: 
-    if w not in stopwords: 
-        stopwords_removed.append(w) 
+# remove unwanted parts of speech
+tagged_words = pos_tag(stopwords_removed)
+pos_removed = [w for w in tagged_words if w[1] not in ('CC','IN','DT','TO')]
+org_feedback = [item[0] for item in pos_removed]
 
-#lemmatize
+
+# lemmatize-need to use pos = 'v' tag to lemmetize verbs in addition to nouns (default is nouns only)
 lemmatizer = WordNetLemmatizer()
+feedback = [lemmatizer.lemmatize(w, pos='v') for w in org_feedback]
 
-lemmatized_words = [lemmatizer.lemmatize(w) for w in stopwords_removed]
+# word count frequency top ten
+counts = Counter(feedback).most_common(10)
 
-#remove characters added by nltk and empty values
-
-reviews_clean = []
-for w in lemmatized_words:
-    reviews_clean.append(w.replace(']', '',).replace('[','').replace('0','').replace('\"','').replace("\'",'')) 
-reviews = list(filter(None, reviews_clean)) 
-
-
-#word count frequency top ten
-counts = Counter(reviews).most_common(10)
-
-#create a wordcloud
+# create a wordcloud
 wordcloud = WordCloud(
-    background_color ='white',
-    max_words = 100,
-    max_font_size = 40).generate(str(' '.join(reviews)))
-
-    
-fig = plt.figure(1, figsize =(20, 20))
+    background_color='white',
+    max_words=100,
+    max_font_size=40).generate(str(' '.join(feedback)))
+fig = plt.figure(1, figsize=(20, 20))
 plt.axis("off")
-       
 plt.imshow(wordcloud)
 plt.show()
 
-
-# convert list to DF and Plot horizontal bar using matplotlib bar().
-
+# convert word count list to DF and Plot horizontal bar using matplotlib bar().
 userReviews = pd.DataFrame(counts,
-                          columns = ['words','count'])
-
-fig,ax = plt.subplots(figsize=(8,8))
-
-userReviews.sort_values(by='count').plot.barh(x = 'words',
-                                           y = 'count',
-                                           ax=ax,
-                                           color = 'purple')
+                           columns=['words', 'count'])
+fig, ax = plt.subplots(figsize=(8, 8))
+userReviews.sort_values(by='count').plot.barh(x='words',
+                                              y='count',
+                                              ax=ax,
+                                              color='purple')
 ax.set_title("Most common words in NPS feedback")
-
 plt.show()
