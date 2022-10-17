@@ -1,0 +1,56 @@
+with
+
+weeks as (
+    select date_trunc('week',date_day) as report_week
+    from days
+    ),
+    
+-- pull all closted won contracts by the contract close date
+contracts as (
+    select
+        products.opportunity_id,
+        opportunities.contract_closed_at,
+        products.is_pilot_contract,
+        count(DISTINCT
+            case
+                when products.is_annual_product
+                then products.id
+            end) as annual_products
+    from products
+    left join opportunities on products.opportunity_id = opportunities.id
+    where opportunities.stage = 'Closed Won'
+    group by 1, 2, 3
+),
+
+-- organize the closed won contracts by contract types desired for reporting
+categorized_contracts as (
+    select
+        opportunity_id,
+        date_trunc('week',contract_closed_at) as contract_closed_week,
+        case
+            when is_pilot_contract is true
+            then 'Pilot'
+            when 
+                annual_products > 0 and 
+                is_pilot_contract is false
+                then 'Annual'
+            else
+                'Non-Annual'
+        end as contract_type
+    from contracts
+),
+
+-- count the number of contracts closed per week by type of contract
+final as (
+    select
+       report_week,
+       contract_type,
+       count(distinct opportunity_id)
+    from weeks
+    left join classified_contracts on
+      weeks.report_week = categorized_contracts.contract_closed_week
+    group by 1,2
+    order by 1
+  )
+
+select * from final
