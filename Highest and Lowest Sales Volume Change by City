@@ -24,6 +24,7 @@ ranked_deltas as (
     -- rank sales volume deltas by asc and desc to find the top and bottom amounts
     select
         city,
+        date,
         sales_volume_delta,
         rank() over (order by sales_volume_delta desc) as largest_increase,
         rank() over (order by sales_volume_delta) as largest_decrease
@@ -40,7 +41,8 @@ select
         when largest_decrease = 1
         then city
     end as bottom,
-       
+     
+    date, 
     sales_volume_delta
 from ranked_deltas
 where 
