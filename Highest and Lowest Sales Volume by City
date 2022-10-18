@@ -1,0 +1,48 @@
+with
+
+sales_volume as (
+-- find the daily sales volume per city
+    select
+       date(order_timestamp) as order_date,
+       cities.name as city,
+       sum(amount) as sales_volume
+    from orders
+    left join cities on orders.city_id = cities.id
+),
+
+sales_volume_deltas as (
+ -- calculate the daily change in sales volume
+    select
+        date,
+        city,
+        sales_volume - lag(sales_volume) over
+            (partition by city order by date) as sales_volume_delta
+    from sales_volume
+),
+
+ranked_deltas as (
+    -- rank sales volume deltas by asc and desc to find the top and bottom amounts
+    select
+        city,
+        sales_volume_delta,
+        rank() over (order by sales_volume_delta desc) as largest_increase,
+        rank() over (order by sales_volume_delta) as largest_decrease
+    from sales_volume_deltas
+)
+
+select
+    case 
+        when largest_increase  = 1
+        then city
+    end as top_city,
+       
+    case 
+        when largest_decrease = 1
+        then city
+    end as bottom,
+       
+    sales_volume_delta
+from ranked_deltas
+where 
+      (largest_increase = 1 or 
+       largest_decrease = 1)
