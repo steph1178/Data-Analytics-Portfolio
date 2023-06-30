@@ -1,0 +1,142 @@
+# import all modules needed
+import redshift_connector
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.linear_model import LinearRegression
+from sklearn.preprocessing import PolynomialFeatures
+import numpy as np
+from tabulate import tabulate
+import statsmodels.api as sm
+
+# open engine connection: conn
+# grab credentials from .env file
+conn = redshift_connector.connect(
+    host='host',
+    database='database',
+    user='user',
+    password='password'
+  )
+
+cursor = conn.cursor()
+# perform query
+cursor.execute(
+    """
+
+    select
+        date_trunc('month', close_date) as close_month,
+
+        sum(acv) as bookings
+    from opportunities
+    where
+          stage = 'Closed Won' and
+          close_date >= '2022-01-01'
+    group by 1
+
+    """
+)
+
+# save the results of the query to a pandas df
+df: pd.DataFrame = cursor.fetch_dataframe()
+
+# close the connection to redshift
+conn.close()
+
+# Convert the 'close_month' column into a numerical representation for model fitting
+df['close_month'] = pd.to_datetime(df['close_month'])  # Convert to datetime format
+reference_date = pd.to_datetime('2022-01-01')  # Choose a suitable reference date
+df['numeric_dates'] = (df['close_month'] - reference_date).dt.days
+
+
+# Define variables
+X = df['numeric_dates'].values.reshape(-1, 1)  # Reshape to a 2D array for independent variable
+y = df['bookings'].values #dependent variable
+
+# Create an instance of the LinearRegression model and fit the data using sklearn
+regression_model = LinearRegression()
+regression_model.fit(X, y)
+
+# Add a constant column to X for the intercept term
+X_with_intercept = sm.add_constant(X)
+
+# Create an OLS (Ordinary Least Squares) model to evaluate model fit
+ols_model = sm.OLS(y, X_with_intercept)
+
+# Fit the OLS model to the data
+ols_results = ols_model.fit()
+
+# Print the regression statistics summary
+print(ols_results.summary())
+
+# Print the coefficient for the linear regression and evaluate results
+print("Coefficient:", regression_model.coef_)
+
+# Convert prediction dates into numerical format
+# Make predictions using the fitted model
+new_dates = ['2022-01-01','2022-02-01','2022-03-01','2022-04-01','2022-05-01','2022-06-01','2022-07-01','2022-08-01','2022-09-01','2022-10-01','2022-11-01','2022-12-01',
+'2023-01-01','2023-02-01','2023-03-01','2023-04-01','2023-05-01','2023-06-01','2023-07-01','2023-08-01','2023-09-01','2023-10-01','2023-11-01','2023-12-01']
+numeric_new_dates = (pd.to_datetime(new_dates) - reference_date).days
+
+
+X_new = np.array(numeric_new_dates).reshape(-1, 1)  # Reshape to a 2D array
+predictions = regression_model.predict(X_new)
+
+# Convert numeric dates back to datetime format
+# Use flatten to convert 2D arrays back to 1D arrays for plotting
+predicted_dates = reference_date + pd.to_timedelta(X_new.flatten(), unit='D')
+
+# Plotting the original data points
+plt.scatter(df['close_month'], df['bookings'], color='blue', label='Original Data')
+
+# Plotting the predicted values
+plt.plot(predicted_dates, predictions, color='red', label='Predicted Values')
+
+# Set labels and title
+plt.xlabel('Close Month')
+plt.ylabel('Bookings')
+plt.title('Linear Regression Predictions')
+
+# Rotate x-axis tick labels for better visibility (if necessary)
+plt.xticks(rotation=45)
+
+# Show legend
+plt.legend()
+
+# Show the plot
+plt.show()
+
+
+# Create a DataFrame to hold the predicted values for table creation
+predictions_df = pd.DataFrame({'Date': predicted_dates, 'Predicted Values': predictions})
+
+# # Print the table using tabulate
+table = tabulate(predictions_df, headers='keys', tablefmt='psql')
+print("All Predicted Values")
+print(table)
+
+# Filter predictions based on available bookings dates
+filtered_dates = []
+filtered_predictions = []
+
+for date, prediction in zip(predicted_dates, predictions):
+    if date in df['close_month'].values:
+        filtered_dates.append(date)
+        filtered_predictions.append(prediction)
+
+# Create a DataFrame with the filtered data
+filtered_df = pd.DataFrame({'Date': filtered_dates, 'Predicted Values': filtered_predictions})
+
+# calculate deltas
+deltas = filtered_df['Predicted Values'] - df['bookings']
+
+#add deltas to filtered_df
+filtered_df['Deltas'] = deltas
+
+#create a new DF to bring all the data together
+result_df = pd.DataFrame({'Date': df['close_month'], 'Original Values': df['bookings'], 'Filtered Predicted Values': filtered_df['Predicted Values'], 'Deltas': filtered_df['Deltas']})
+
+# Sort the DataFrame by the 'Date' column
+result_df_sorted = result_df.sort_values('Date')
+
+# Print the table using tabulate
+table = tabulate(result_df_sorted, headers='keys', tablefmt='psql')
+print(table)
