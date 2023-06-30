@@ -4,6 +4,7 @@ This repository contains a sample of data analytics projects using SQL and Pytho
 
 ## Analysis
 * [COVID Data Analysis Project](https://github.com/steph1178/COVID19_testing_analytics/blob/main/Metrics%20Documentation.md): For this project, I pulled the total number of PCR tests as of 5/1/2021, the 7-day rolling average of new cases per day, and the top 10 states with the highest positivity rates. I also provide a written analysis of of how to interpret the results.
+* [Linear Regression to Predict Sales Volume](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Linear%20Regression%20to%20Predict%20Sales): This program produces a linear regression to predict sales over a six month period.
 * [Highest and Lowest Sales Volume Change Per City](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/Highest%20and%20Lowest%20Sales%20Volume%20Change%20by%20City): This query pulls which cities had the highest and lowest day-over-day change in sales volume.
 * [Incomes of Users in Targeted Email](https://github.com/steph1178/Data-Analytics-Portfolio/blob/master/incomes%20of%20users%20in%20targeted%20email): This query pulls states with the highest number of high-income earners that were targeted by a luxury email campaign.
 
